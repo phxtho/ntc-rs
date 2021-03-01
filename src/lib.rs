@@ -1,7 +1,6 @@
 mod utils;
 
 use wasm_bindgen::prelude::*;
-use std::cmp;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -16,9 +15,9 @@ extern {
 
 #[wasm_bindgen]
 pub fn hex_color_to_rgb (hex_colour: &str) -> Vec<u32> {
-    let r = hex_to_u32(&hex_colour[1..3]);
-    let g = hex_to_u32(&hex_colour[3..5]);
-    let b = hex_to_u32(&hex_colour[5..7]);
+    let r = hex_to_u32(&hex_colour[0..=1]);
+    let g = hex_to_u32(&hex_colour[2..=3]);
+    let b = hex_to_u32(&hex_colour[4..=5]);
     return vec![r, g, b]
 }
 
@@ -68,7 +67,9 @@ pub fn rgb_to_hsl(rgb: Vec<u32>) -> Vec<u32> {
     return vec![(h * 255.) as u32, (s * 255.) as u32, (l * 255.) as u32 ];
 }
 
-#[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, ntc!");
+#[test]
+fn test_hex_color_to_rgb () {
+    assert_eq!(vec![0,0,0], hex_color_to_rgb("000000")); // Black
+    assert_eq!(vec![128,128,128], hex_color_to_rgb("808080")); // Grey
+    assert_eq!(vec![255,255,255], hex_color_to_rgb("FFFFFF")); // White
 }
