@@ -35,5 +35,5 @@ pub fn get_colour_list () -> Vec<Colour> {
 #[test]
 fn test_get_colour_map () {
     let colour_list = get_colour_list();
-    assert_eq!(colour_list.len(),1500);
+    assert_eq!(colour_list.len(),1566);
 }
