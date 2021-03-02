@@ -8,3 +8,9 @@ pub fn set_panic_hook() {
     #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
 }
+
+pub fn hex_to_u32(hex_string: &str) -> u32 {
+    // Hex string to 4-bytes, aka. u32
+    let parsed_int:u32 = u32::from_str_radix(hex_string, 16).unwrap();
+    return parsed_int;
+}

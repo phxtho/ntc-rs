@@ -1,6 +1,8 @@
 mod utils;
+mod colour;
 
 use wasm_bindgen::prelude::*;
+use utils::hex_to_u32;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -19,12 +21,6 @@ pub fn hex_color_to_rgb (hex_colour: &str) -> Vec<u32> {
     let g = hex_to_u32(&hex_colour[2..=3]);
     let b = hex_to_u32(&hex_colour[4..=5]);
     return vec![r, g, b]
-}
-
-fn hex_to_u32(hex_string: &str) -> u32 {
-    // Hex string to 4-bytes, aka. u32
-    let parsed_int:u32 = u32::from_str_radix(hex_string, 16).unwrap();
-    return parsed_int;
 }
 
 #[wasm_bindgen]
