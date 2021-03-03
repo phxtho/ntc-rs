@@ -5,16 +5,15 @@ use std::io::BufReader;
 use std::path::Path;
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "PascalCase")]
 pub struct Colour {
     name: String,
     hex: String,
     rgb: Vec<u32>,
-    hsl: Vec<u32>
+    hsl: Vec<i32>
 }
 
 impl Colour {
-    pub fn new(name: String, hex: String,rgb: Vec<u32>, hsl: Vec<u32>) -> Colour {
+    pub fn new(name: String, hex: String,rgb: Vec<u32>, hsl: Vec<i32>) -> Colour {
         return Colour {
             name,hex,rgb,hsl
         };
@@ -28,7 +27,7 @@ pub fn get_colour_list () -> Vec<Colour> {
     let reader = BufReader::new(file);
 
     // Read the JSON contents of the file
-    let list_of_colours: Vec<Colour> = serde_json::from_reader(reader).expect("file should be proper JSON");
+    let list_of_colours: Vec<Colour> = serde_json::from_reader(reader).expect("Couldn't parse JSON");
     return list_of_colours;
 }
 
