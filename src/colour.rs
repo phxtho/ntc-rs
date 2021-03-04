@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use std::fs::File;
 use std::io::BufReader;
-use std::path::Path;
+use std::path::Path; 
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Colour {
@@ -21,13 +21,8 @@ impl Colour {
 }
 
 pub fn get_colour_list () -> Vec<Colour> {
-    // Open the file in read-only mode with buffer
-    let path = Path::new("./data/colourMap.json");
-    let file = File::open(path).expect("file should open read only");
-    let reader = BufReader::new(file);
-
     // Read the JSON contents of the file
-    let list_of_colours: Vec<Colour> = serde_json::from_reader(reader).expect("Couldn't parse JSON");
+    let list_of_colours: Vec<Colour> = serde_json::from_str(crate::colour_list::colour_list_json).expect("Couldn't parse JSON");
     return list_of_colours;
 }
 

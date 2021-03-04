@@ -1,5 +1,6 @@
 mod utils;
 mod colour;
+mod colour_list;
 
 use wasm_bindgen::prelude::*;
 use utils::hex_to_i32;
