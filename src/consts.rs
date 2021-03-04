@@ -1,4 +1,4 @@
-[
+pub const COLOURS_JSON : &str = r#"[
   {
     "name": "Acadia",
     "hex": "35312C",
@@ -11473,3 +11473,4 @@
     "shade": "Grey"
   }
 ]
+"#;

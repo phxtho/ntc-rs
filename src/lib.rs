@@ -1,6 +1,6 @@
 mod utils;
 mod colour;
-mod colour_list;
+mod consts;
 
 use wasm_bindgen::prelude::*;
 use utils::hex_to_i32;
@@ -11,11 +11,6 @@ use colour::{Colour, get_colour_list};
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
-#[wasm_bindgen]
-extern {
-    fn alert(s: &str);
-}
 
 #[wasm_bindgen]
 pub fn hex_color_to_rgb (hex_colour: &str) -> Vec<i32> {
@@ -81,11 +76,9 @@ fn test_rgb_to_hsl () {
     assert_eq!(vec![0,0,255], rgb_to_hsl(vec![255,255,255])); // White
 }
 
-#[wasm_bindgen]
-pub fn closest_colour(rgb : Vec<i32>) -> String {
-    let colour_list = get_colour_list();
-    let mut ndf = 0;
-    let mut cl = Colour::new(String::from("Invalid Colour"), String::from("00000000"), vec![0,0,0], vec![0,0,0]);
+pub fn closest_colour(rgb : &Vec<i32>, colour_list: &Vec<Colour>) -> Colour {
+    let mut _ndf = 0;
+    let mut cl = Colour::new(String::from("Invalid Colour"), String::from("00000000"), vec![0,0,0], vec![0,0,0], String::from("Invalid Shade"));
     let mut df = -1;
     let hsl = rgb_to_hsl(rgb.clone());
 
@@ -98,17 +91,29 @@ pub fn closest_colour(rgb : Vec<i32>) -> String {
             + (hsl[1] - colour.hsl[1]).pow(2) 
             + (hsl[2] - colour.hsl[2]).pow(2);
 
-        ndf = rgb_distance + hsl_distance * 2;
+        _ndf = rgb_distance + hsl_distance * 2;
 
-        if df < 0 || df > ndf {
-            df = ndf;
+        if df < 0 || df > _ndf {
+            df = _ndf;
             cl = colour.clone();
         }
     }
-    return cl.name;
+    return cl;
 }
 
 #[test]
 fn test_closest_colour() {
-    assert_eq!("White Ice", closest_colour(vec![221, 249, 241]));
+    let all_colours = get_colour_list();
+    assert_eq!("White Ice", closest_colour(&vec![215, 238, 228], &all_colours).name);
 }
+
+/// Return the closest colour as a json object
+#[wasm_bindgen]
+pub fn closest_colour_json(rgb : Vec<i32>) -> String {
+    let all_colours = get_colour_list();
+    let colour = closest_colour(&rgb, &all_colours);
+    let response = serde_json::to_string(&colour).unwrap();
+    return response;
+}
+
+
