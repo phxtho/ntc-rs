@@ -2,7 +2,8 @@ mod utils;
 mod colour;
 
 use wasm_bindgen::prelude::*;
-use utils::hex_to_u32;
+use utils::hex_to_i32;
+use colour::{Colour, get_colour_list};
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -16,15 +17,22 @@ extern {
 }
 
 #[wasm_bindgen]
-pub fn hex_color_to_rgb (hex_colour: &str) -> Vec<u32> {
-    let r = hex_to_u32(&hex_colour[0..=1]);
-    let g = hex_to_u32(&hex_colour[2..=3]);
-    let b = hex_to_u32(&hex_colour[4..=5]);
-    return vec![r, g, b]
+pub fn hex_color_to_rgb (hex_colour: &str) -> Vec<i32> {
+    let r = hex_to_i32(&hex_colour[0..=1]);
+    let g = hex_to_i32(&hex_colour[2..=3]);
+    let b = hex_to_i32(&hex_colour[4..=5]);
+    return vec![r, g , b ];
+}
+
+#[test]
+fn test_hex_color_to_rgb () {
+    assert_eq!(vec![0,0,0], hex_color_to_rgb("000000")); // Black
+    assert_eq!(vec![128,128,128], hex_color_to_rgb("808080")); // Grey
+    assert_eq!(vec![255,255,255], hex_color_to_rgb("FFFFFF")); // White
 }
 
 #[wasm_bindgen]
-pub fn rgb_to_hsl(rgb: Vec<u32>) -> Vec<u32> {
+pub fn rgb_to_hsl(rgb: Vec<i32>) -> Vec<i32> {
     if rgb.len() != 3 {
         return vec![0,0,0]
     }
@@ -62,14 +70,7 @@ pub fn rgb_to_hsl(rgb: Vec<u32>) -> Vec<u32> {
         h /= 6.;
     }
 
-    return vec![(h * 255.) as u32, (s * 255.) as u32, (l * 255.) as u32 ];
-}
-
-#[test]
-fn test_hex_color_to_rgb () {
-    assert_eq!(vec![0,0,0], hex_color_to_rgb("000000")); // Black
-    assert_eq!(vec![128,128,128], hex_color_to_rgb("808080")); // Grey
-    assert_eq!(vec![255,255,255], hex_color_to_rgb("FFFFFF")); // White
+    return vec![(h * 255.) as i32, (s * 255.) as i32, (l * 255.) as i32 ];
 }
 
 #[test]
@@ -77,4 +78,36 @@ fn test_rgb_to_hsl () {
     assert_eq!(vec![0,0,0], rgb_to_hsl(vec![0,0,0])); // Black
     assert_eq!(vec![0,0,128], rgb_to_hsl(vec![128,128,128])); // Grey
     assert_eq!(vec![0,0,255], rgb_to_hsl(vec![255,255,255])); // White
+}
+
+#[wasm_bindgen]
+pub fn closest_colour(rgb : Vec<i32>) -> String {
+    let colour_list = get_colour_list();
+    let mut ndf = 0;
+    let mut cl = Colour::new(String::from("Invalid Colour"), String::from("00000000"), vec![0,0,0], vec![0,0,0]);
+    let mut df = -1;
+    let hsl = rgb_to_hsl(rgb.clone());
+
+    for colour in colour_list.iter() {
+        let rgb_distance = (rgb[0] - colour.rgb[0]).pow(2) 
+            + (rgb[1] - colour.rgb[1]).pow(2) 
+            + (rgb[2] - colour.rgb[2]).pow(2);
+
+        let hsl_distance = (hsl[0] - colour.hsl[0]).pow(2) 
+            + (hsl[1] - colour.hsl[1]).pow(2) 
+            + (hsl[2] - colour.hsl[2]).pow(2);
+
+        ndf = rgb_distance + hsl_distance * 2;
+
+        if df < 0 || df > ndf {
+            df = ndf;
+            cl = colour.clone();
+        }
+    }
+    return cl.name;
+}
+
+#[test]
+fn test_closest_colour() {
+    assert_eq!("White Ice", closest_colour(vec![221, 249, 241]));
 }

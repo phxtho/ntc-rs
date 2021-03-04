@@ -4,16 +4,16 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Colour {
-    name: String,
-    hex: String,
-    rgb: Vec<u32>,
-    hsl: Vec<i32>
+    pub name: String,
+    pub hex: String,
+    pub rgb: Vec<i32>,
+    pub hsl: Vec<i32>
 }
 
 impl Colour {
-    pub fn new(name: String, hex: String,rgb: Vec<u32>, hsl: Vec<i32>) -> Colour {
+    pub fn new(name: String, hex: String,rgb: Vec<i32>, hsl: Vec<i32>) -> Colour {
         return Colour {
             name,hex,rgb,hsl
         };
