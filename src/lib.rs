@@ -1,10 +1,9 @@
 mod utils;
 mod colour;
-mod consts;
 
 use wasm_bindgen::prelude::*;
 use utils::hex_to_i32;
-use colour::{Colour, get_colour_list};
+use colour::{Colour, ALL_COLOURS};
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -76,13 +75,14 @@ fn test_rgb_to_hsl () {
     assert_eq!(vec![0,0,255], rgb_to_hsl(vec![255,255,255])); // White
 }
 
-pub fn closest_colour(rgb : &Vec<i32>, colour_list: &Vec<Colour>) -> Colour {
+#[wasm_bindgen]
+pub fn closest_colour(rgb : Vec<i32>) -> Colour {
     let mut _ndf = 0;
-    let mut cl = Colour::new(String::from("Invalid Colour"), String::from("00000000"), vec![0,0,0], vec![0,0,0], String::from("Invalid Shade"));
+    let mut cl = Colour { name: "Black",hex: "000000",rgb: &[0, 0, 0],hsl: &[0, 0, 0],shade: "Black"};
     let mut df = -1;
     let hsl = rgb_to_hsl(rgb.clone());
 
-    for colour in colour_list.iter() {
+    for colour in ALL_COLOURS.iter() {
         let rgb_distance = (rgb[0] - colour.rgb[0]).pow(2) 
             + (rgb[1] - colour.rgb[1]).pow(2) 
             + (rgb[2] - colour.rgb[2]).pow(2);
@@ -95,7 +95,7 @@ pub fn closest_colour(rgb : &Vec<i32>, colour_list: &Vec<Colour>) -> Colour {
 
         if df < 0 || df > _ndf {
             df = _ndf;
-            cl = colour.clone();
+            cl = Colour {name: colour.name, hex: colour.hex, rgb: colour.rgb, hsl: colour.hsl, shade: colour.shade}
         }
     }
     return cl;
@@ -103,17 +103,7 @@ pub fn closest_colour(rgb : &Vec<i32>, colour_list: &Vec<Colour>) -> Colour {
 
 #[test]
 fn test_closest_colour() {
-    let all_colours = get_colour_list();
-    assert_eq!("White Ice", closest_colour(&vec![215, 238, 228], &all_colours).name);
-}
-
-/// Return the closest colour as a json object
-#[wasm_bindgen]
-pub fn closest_colour_json(rgb : Vec<i32>) -> String {
-    let all_colours = get_colour_list();
-    let colour = closest_colour(&rgb, &all_colours);
-    let response = serde_json::to_string(&colour).unwrap();
-    return response;
+    assert_eq!("White Ice", closest_colour(vec![215, 238, 228]).name);
 }
 
 
