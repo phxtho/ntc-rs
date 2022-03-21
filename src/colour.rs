@@ -9,7 +9,7 @@ pub struct Colour {
     pub shade: &'static str
 }
 
-pub static  ALL_COLOURS: &'static [Colour] = &[
+pub const  ALL_COLOURS: &[Colour; 1639] = &[
       Colour {
         name: "Acadia",
         hex: "35312C",
