@@ -2,11 +2,53 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct Colour {
-    pub name: &'static str,
-    pub hex: &'static str,
-    pub rgb: &'static [i32],
-    pub hsl: &'static [i32],
-    pub shade: &'static str
+  #[wasm_bindgen(skip)]
+  pub name: &'static str,
+  #[wasm_bindgen(skip)]
+  pub hex: &'static str,
+  #[wasm_bindgen(skip)]
+  pub rgb: &'static [i32],
+  #[wasm_bindgen(skip)]
+  pub hsl: &'static [i32],
+  #[wasm_bindgen(skip)]
+  pub shade: &'static str,
+}
+
+#[wasm_bindgen]
+impl Colour {
+  #[wasm_bindgen(getter)]
+  pub fn name(&self) -> String {
+    return String::from(self.name);
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn hex(&self) -> String {
+    return String::from(self.hex);
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn rgb(&self) -> js_sys::Int32Array {
+    return js_sys::Int32Array::from(&self.rgb[..]);
+  }
+
+  #[wasm_bindgen(getter)]
+  pub fn hsl(&self) -> js_sys::Int32Array {
+    return js_sys::Int32Array::from(&self.hsl[..]);
+  }
+  #[wasm_bindgen(getter)]
+  pub fn shade(&self) -> String {
+    return String::from(self.shade);
+  }
+}
+
+impl Colour {
+  pub fn rgb_vec(&self) -> Vec<i32> {
+    return Vec::from(&self.rgb[..]);
+  }
+
+  pub fn hsl_vec(&self) -> Vec<i32> {
+    return Vec::from(&self.hsl[..]);
+  }
 }
 
 pub const  ALL_COLOURS: &[Colour; 1639] = &[
