@@ -75,7 +75,7 @@ fn test_rgb_to_hsl() {
 
 #[wasm_bindgen]
 pub fn closest_colour(rgb: Vec<i32>) -> Colour {
-    let mut _ndf = 0;
+    let mut _ndf = 0.;
     let mut cl = Colour {
         name: "Black",
         hex: "000000",
@@ -83,25 +83,12 @@ pub fn closest_colour(rgb: Vec<i32>) -> Colour {
         hsl: &[0, 0, 0],
         shade: "Black",
     };
-    let mut df = -1;
-    let hsl = rgb_to_hsl(rgb.clone());
-    let mut colour_rgb: Vec<i32>;
-    let mut colour_hsl: Vec<i32>;
+    let mut df = -1.;
 
     for colour in ALL_COLOURS.iter() {
-        colour_rgb = colour.rgb_vec();
-        let rgb_distance = (rgb[0] - colour_rgb[0]).pow(2)
-            + (rgb[1] - colour_rgb[1]).pow(2)
-            + (rgb[2] - colour_rgb[2]).pow(2);
+        _ndf = redmean_distance(colour.rgb_vec(), rgb.clone());
 
-        colour_hsl = colour.hsl_vec();
-        let hsl_distance = (hsl[0] - colour_hsl[0]).pow(2)
-            + (hsl[1] - colour_hsl[1]).pow(2)
-            + (hsl[2] - colour_hsl[2]).pow(2);
-
-        _ndf = rgb_distance + hsl_distance * 2;
-
-        if df < 0 || df > _ndf {
+        if df < 0. || df > _ndf {
             df = _ndf;
             cl = Colour {
                 name: colour.name,
@@ -118,4 +105,17 @@ pub fn closest_colour(rgb: Vec<i32>) -> Colour {
 #[test]
 fn test_closest_colour() {
     assert_eq!("White Ice", closest_colour(vec![215, 238, 228]).name);
+}
+
+fn redmean_distance(a: Vec<i32>, b: Vec<i32>) -> f32 {
+    let r_bar: f32 = (a[0] as f32 + b[0] as f32) / 2.;
+    let r_coeff = 2. + (r_bar / 256.);
+    let g_coeff = 4.;
+    let b_coeff = 2. + ((255. - r_bar) / 256.);
+
+    let distance = (r_coeff * ((a[0] - b[0]) as f32).powf(2.)
+        + g_coeff * ((a[1] - b[1]) as f32).powf(2.)
+        + b_coeff * ((a[2] - b[2]) as f32).powf(2.))
+    .sqrt();
+    return distance;
 }
